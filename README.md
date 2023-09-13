@@ -1,4 +1,4 @@
-# FLIXERDB
+# MovieBox
 
 This is a movie database project that was inspired a design by HNG. The design was provided by HNG internship. I used Create react app to run it and it was styled using tailwind css while the more general designs are in the index.css file.
 Data used for this project were gotten from TMDB API
