@@ -1,70 +1,109 @@
-# Getting Started with Create React App
+# FLIXERDB
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a movie database project that was inspired a design by HNG. The design was provided by HNG internship. I used Create react app to run it and it was styled using tailwind css while the more general designs are in the index.css file.
+Data used for this project were gotten from TMDB API
 
-## Available Scripts
+I started this project by creating 3 custom react hooks.
 
-In the project directory, you can run:
+- useFetchMovieDb
+- useMovie and
+- useFetch 
 
-### `npm start`
+## useFetchMovieDb.js
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+This Hook accepts an endpoint and query. The endpoint fetches data for both movie and series using the TMDB API. the endpoint can either be /discover or /popular or any endpoint depending on the particular data one wants to fetch from TMDB.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```Javascript
 
-### `npm test`
+import { useState, useEffect } from 'react';
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+export function useFetchMovieDb(endpoint, query) {
 
-### `npm run build`
+  useEffect(() => {
+    const controller = new AbortController();
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    const movieCompany = async () => {
+      setIsLoading(true);
+      try {
+        const responses = await Promise.all(
+          types.map(type =>
+            fetch(
+              `https://api.themoviedb.org/3/${endpoint}/${type}?api_key=${API_KEY}${query}`,
+              { signal: controller.signal }
+            )
+          )
+        );
+        const data = await Promise.all(
+          responses.map(res => {
+            if (!res.ok) {
+              throw new Error(res.statusText);
+            }
+            return res.json();
+          })
+        );
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+        setIsLoading(false);
+        setData(data);
+        setError(null);
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          console.log('the fetch was aborted');
+        } else {
+          console.log(err);
+          setIsLoading(false);
+          setError(err);
+        }
+      }
+    };
+    movieCompany();
+    return () => {
+      controller.abort();
+    };
+  }, [endpoint]);
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  return { data, isLoading, error, API_KEY, types };
+}
 
-### `npm run eject`
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## useMovie
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+This hook uses the /discover endpoint to fetch movie and tv series from TMDB. It accepts a query which cn be use to sort the movie or tv series base on certain criteria
+After fetching each movie the hook gets the id of each movie and fetches the specific data of each movie which contain details that may not be gotten from the /discover endpoint.
+The hook also adds a media type property to each movie or Tv serie to enable easy rendering of specific data in dom.
+finally this hook filters the tv and movie and adds them to an array which can be used to if a user needs data for just the movie or the Tv series.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```JavaScript
+ const fetchDetails = async () => {
+        const urls = allId.map(
+          ({ id, type }) =>
+            `https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&append_to_response=videos${query}`
+        );
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+        try {
+          setMediaLoading(true);
+          const responses = await Promise.all(urls.map(url => fetch(url)));
+          const details = await Promise.all(
+            responses.map(res => {
+              if (!res.ok) throw new Error(res.statusText);
+              return res.json();
+            })
+          );
+          setMediaLoading(false);
+          setMediaError(null);
+          const combinedMedia = details.map((data, i) => ({
+            ...data,
+            media_type: allId[i].type,
+          }));
+          setMedia(combinedMedia);
+        } catch (err) {
+          setMediaLoading(false);
+          setMediaError(err);
+          console.log(err);
+        }
+      };
+      fetchDetails();
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
