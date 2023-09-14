@@ -10,8 +10,10 @@ export default function MovieDetails() {
 
   return (
     <div>
-      {isPending && <p className="loading">Loading....</p>}
-      {error && <p className="error">{error}</p>}
+      {isPending && (
+        <p className="loading fixed top-20 left-[40vw]">Loading....</p>
+      )}
+      {error && <p className="error fixed top-20 left-[40vw]">{error}</p>}
       {data && (
         <div>
           <img
