@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 export default function Hero({ movie, loading }) {
   const [intervalId, setIntervalId] = useState();
@@ -25,6 +25,9 @@ export default function Hero({ movie, loading }) {
 
   return (
     <div className="relative w-full bg-white h-[360px] md:h-[500px] -z-10 mb-9">
+      {loading && (
+        <p className="loading fixed top-20 left-[40vw]">Loading...</p>
+      )}
       {movie.map((mov, i) => (
         <div
           key={i}

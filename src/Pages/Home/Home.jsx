@@ -9,8 +9,9 @@ export default function Home() {
   return (
     <div>
       {error && <p className="error">{error}</p>}
-      {loading && <p className="loading">Loading...</p>}
       {movie && <Hero movie={movie} loading={loading} />}
+      {/* {loading && <p className="loading">Loading...</p>} */}
+
       {movie && <MovieList movie={movie} />}
     </div>
   );

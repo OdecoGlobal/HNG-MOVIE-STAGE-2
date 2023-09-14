@@ -8,6 +8,9 @@ export default function MovieList({ movie }) {
   console.log(feature);
   return (
     <div>
+      <h3 className="w-fit mx-auto font-bold text-xl md:text-3xl mb-6">
+        Top 10 Movies
+      </h3>
       <div
         data-testid="movie-card"
         className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-7 px-5 auto-rows-[minmax(200px,_1fr)]"
